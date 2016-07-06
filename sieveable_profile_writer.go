@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"github.com/kalharbi/sieveable-profile/dbwriter"
+	"github.com/sieveable/sieveable-profile/dbwriter"
 	"io/ioutil"
 	"log"
 )
