@@ -1,2 +1,18 @@
 language: go
-
+go:
+  - tip
+services:
+  - mysql
+env:
+  - USER=travis
+  - PW=
+  - DB=test_apps
+before_install:
+  - go get github.com/mattn/goveralls
+  - go get golang.org/x/tools/cmd/cover
+before_script:
+  - cat db_commands.sql | mysql -u travis
+script:
+  - go test -covermode=count -coverprofile=profile.cov github.com/sieveable/sieveable-profile/dbwriter
+after_success:
+  - goveralls -coverprofile=profile.cov -service=travis
