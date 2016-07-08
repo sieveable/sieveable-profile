@@ -2,7 +2,7 @@ package dbwriter
 
 import (
 	"encoding/json"
-	"log"
+	"fmt"
 	"time"
 )
 
@@ -79,10 +79,10 @@ type Response struct {
 	Apps     []AppType
 }
 
-func Parse(fileContent *[]byte) Response {
+func Parse(fileContent *[]byte) (Response, error) {
 	var res Response
 	if err := json.Unmarshal(*fileContent, &res); err != nil {
-		log.Fatalf("Failed to parse JSON data. %v\n", err)
+		return res, fmt.Errorf("Failed to parse JSON data. %v\n", err)
 	}
-	return res
+	return res, nil
 }

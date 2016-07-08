@@ -33,7 +33,10 @@ func TestParse(t *testing.T) {
 		}
 		]
 	}`)
-	parsed := Parse(&jsonBlob)
+	parsed, err := Parse(&jsonBlob)
+	if err != nil {
+		t.Errorf("Expected to parse the JSON blob but got an error instead: %v", err)
+	}
 	expectedCategory := CategoryType{Type: "ui", Name: "material-design",
 		Description: "Apps that implement Material Design"}
 	expectedFeature := FeatureType{Name: "feature_name",

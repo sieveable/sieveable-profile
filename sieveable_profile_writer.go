@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/sieveable/sieveable-profile/dbwriter"
 	"io/ioutil"
 	"log"
@@ -13,14 +14,19 @@ func main() {
 	if len(args) != 1 {
 		log.Fatalln("A JSON file must be given as an argument")
 	}
-	parsed := parseInFile(args[0])
-	dbwriter.Insert(parsed)
+	parsed, err := parseInFile(args[0])
+	if err != nil {
+		log.Fatalf("Parser Error: %v", err)
+	}
+	if err := dbwriter.Insert(parsed); err != nil {
+		log.Fatalf("Failed to insert app features in %s. Reason: %v", args[0], err)
+	}
 }
 
-func parseInFile(file string) dbwriter.Response {
+func parseInFile(file string) (res dbwriter.Response, err error) {
 	content, err := ioutil.ReadFile(file)
 	if err != nil {
-		log.Fatalf("Failed to read input file. %v\n", err)
+		return res, fmt.Errorf("Failed to read input file. %v\n", err)
 	}
 	return dbwriter.Parse(&content)
 }
