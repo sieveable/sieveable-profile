@@ -4,22 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	"os"
 	"strings"
 )
 
 // Insert the parsed response into MySQL db
-func Insert(res Response) (err error) {
-	db, err := sql.Open("mysql", os.Getenv("USER")+":"+os.Getenv("PW")+"@/"+os.Getenv("DB"))
-	if err != nil {
-		return fmt.Errorf("Failed to get a handle for the database %s. %v\n",
-			os.Getenv("DB"), err.Error())
-	}
-	defer db.Close()
-	if err = db.Ping(); err != nil {
-		return fmt.Errorf("Failed to connect to DB. Make sure that the required "+
-			"environment variables are set. %v\n", err.Error())
-	}
+func Insert(db *sql.DB, res Response) (err error) {
 	fmt.Println("Inserting new category", res.Category.Name)
 	categoryId, err := insertCategory(db, &res.Category)
 	if err != nil {

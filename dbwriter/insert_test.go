@@ -1,7 +1,9 @@
 package dbwriter
 
 import (
+	"database/sql"
 	"gopkg.in/DATA-DOG/go-sqlmock.v1"
+	"os"
 	"testing"
 	"time"
 )
@@ -94,8 +96,13 @@ func TestInsertAppFeature(t *testing.T) {
 	}
 }
 func TestIntegration(t *testing.T) {
+	db, err := sql.Open("mysql", os.Getenv("USER")+":"+os.Getenv("PW")+"@/"+os.Getenv("DB"))
+	if err != nil {
+		t.Errorf("Failed to get a handle for the database %s. %v\n",
+			os.Getenv("DB"), err.Error())
+	}
 	var res Response = Response{category, feature, []AppType{app}}
-	if err := Insert(res); err != nil {
+	if err := Insert(db, res); err != nil {
 		t.Errorf("Expected to insert app feature but got an error instead: %v", err)
 	}
 }
