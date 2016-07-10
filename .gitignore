@@ -3,6 +3,9 @@
 *.a
 *.so
 
+# coverage
+*.cov
+
 # Folders
 _obj
 _test
