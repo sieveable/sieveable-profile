@@ -1,9 +1,7 @@
 package dbwriter
 
 import (
-	"database/sql"
 	"gopkg.in/DATA-DOG/go-sqlmock.v1"
-	"os"
 	"testing"
 	"time"
 )
@@ -86,9 +84,9 @@ func TestInsertAppFeature(t *testing.T) {
 	}
 	defer db.Close()
 	mock.ExpectPrepare("INSERT INTO app_feature").ExpectExec().
-		WithArgs("com.app", 1).
+		WithArgs(app.Id, 1).
 		WillReturnResult(sqlmock.NewResult(1, 1))
-	if err := insertAppFeature(db, "com.app", 1); err != nil {
+	if err := insertAppFeature(db, app.Id, 1); err != nil {
 		t.Errorf("error was not expected while inserting an app feature: %s", err)
 	}
 	if err := mock.ExpectationsWereMet(); err != nil {
@@ -96,13 +94,32 @@ func TestInsertAppFeature(t *testing.T) {
 	}
 }
 func TestIntegration(t *testing.T) {
-	db, err := sql.Open("mysql", os.Getenv("USER")+":"+os.Getenv("PW")+"@/"+os.Getenv("DB"))
+	db, mock, err := sqlmock.New()
 	if err != nil {
-		t.Errorf("Failed to get a handle for the database %s. %v\n",
-			os.Getenv("DB"), err.Error())
+		t.Fatalf("an error occurred: '%s' when attempting to open a stub db connection", err)
 	}
+	defer db.Close()
+	mock.ExpectPrepare("INSERT INTO category").ExpectExec().
+		WithArgs(category.Name, category.Type, category.Description).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectPrepare("INSERT INTO feature").ExpectExec().
+		WithArgs(feature.Name, feature.Description,
+			feature.SieveableQuery, 1).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectPrepare("INSERT INTO app").ExpectExec().
+		WithArgs(app.Id, app.PackageName, app.VersionCode,
+			app.VersionName, app.Listing.Downloads, app.Listing.Ratings,
+			app.Listing.ReleaseDate.Format("2006-01-02")).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectPrepare("INSERT INTO app_feature").ExpectExec().
+		WithArgs(app.Id, 1).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
 	var res Response = Response{category, feature, []AppType{app}}
 	if err := Insert(db, res); err != nil {
 		t.Errorf("Expected to insert app feature but got an error instead: %v", err)
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expections: %s", err)
 	}
 }
