@@ -37,6 +37,7 @@ func setup() (err error) {
 		return err
 	}
 	var res dbwriter.Response = dbwriter.Response{category, feature, []dbwriter.AppType{app}}
+	fmt.Println("Inserting", res)
 	return dbwriter.Insert(db, res)
 }
 
@@ -53,10 +54,30 @@ func getDbConnection() (*sql.DB, error) {
 	return db, nil
 }
 
-func TestGetAppFeatures(t *testing.T) {
-	features, err := GetAppFeaturesByPackageName(db, app.PackageName)
+func TestGetFeaturesByPackageName(t *testing.T) {
+	features, err := GetFeaturesByPackageName(db, app.PackageName)
 	if err != nil {
 		t.Errorf("Expected app features but got an error instead. %v", err)
+	}
+	if len(features) != 1 {
+		t.Errorf("Expected an array of features with size 1 but got %d instead", len(features))
+	}
+}
+
+func TestGetAppsByFeatureName(t *testing.T) {
+	apps, err := GetAppsByFeatureName(db, feature.Name)
+	if err != nil {
+		t.Errorf("Expected an array of apps but got an error instead. %v", err)
+	}
+	if len(apps) != 1 {
+		t.Errorf("Expected an array of apps with size 1 but got %d instead", len(apps))
+	}
+}
+func TestGetFeaturesByCategoryName(t *testing.T) {
+	fmt.Println("Category name", category.Name)
+	features, err := GetFeaturesByCategoryName(db, category.Name)
+	if err != nil {
+		t.Errorf("Expected an array of features but got an error instead. %v", err)
 	}
 	if len(features) != 1 {
 		t.Errorf("Expected an array of features with size 1 but got %d instead", len(features))
