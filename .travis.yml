@@ -12,8 +12,5 @@ before_install:
   - go get golang.org/x/tools/cmd/cover
 before_script:
   - cat db_commands.sql | mysql -u travis
-script:
-  - go test -v -covermode=count -coverprofile=profile_dbwriter.cov github.com/sieveable/sieveable-profile/dbwriter
-  - go test -v -covermode=count -coverprofile=profile_dbretrieval.cov github.com/sieveable/sieveable-profile/dbretrieval
 #after_success:
 #  - $HOME/gopath/bin/goveralls -coverprofile=profile_dbwriter.cov -service=travis-ci
