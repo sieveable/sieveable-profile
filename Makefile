@@ -6,9 +6,14 @@ endif
 ifndef USER
 	$(error Environemnt variable USER is undefined)
 endif
-test: check-env
+deps:
+	go get -v ./...
+test-deps:
+	go get -t -v ./...
+test: check-env test-deps
 	go test -v -covermode=count -coverprofile=profile_dbwriter.cov github.com/sieveable/sieveable-profile/dbwriter
 	go test -v -covermode=count -coverprofile=profile_dbretrieval.cov github.com/sieveable/sieveable-profile/dbretrieval
 
-build: test
-	go build -o sieveable_profile_writer sieveable_profile_writer.go
+build: deps test
+	go build -o sieveable_profile_writer.out sieveable_profile_writer.go
+
