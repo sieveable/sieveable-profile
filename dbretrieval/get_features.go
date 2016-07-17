@@ -5,9 +5,9 @@ import (
 )
 
 type FeatureResult struct {
-	Name           string
-	Description    string
-	SieveableQuery string
+	Name           string `json:"name"`
+	Description    string `json:"description"`
+	SieveableQuery string `json:"sieveable_query"`
 }
 
 // Given the package name, return the app's features
