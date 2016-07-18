@@ -13,6 +13,7 @@ test-deps:
 test: check-env test-deps
 	go test -v -covermode=count -coverprofile=profile_dbwriter.cov github.com/sieveable/sieveable-profile/dbwriter
 	go test -v -covermode=count -coverprofile=profile_dbretrieval.cov github.com/sieveable/sieveable-profile/dbretrieval
+	go test -v -covermode=count -coverprofile=profile_server.cov github.com/sieveable/sieveable-profile/server
 
 build: deps test
 	go build -o sieveable_profile_writer.out sieveable_profile_writer.go

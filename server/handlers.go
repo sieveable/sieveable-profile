@@ -12,7 +12,7 @@ type DbHandler struct {
 	db *sql.DB
 }
 
-func (dbHandler *DbHandler) GetAppsByFeatureName(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (dbHandler *DbHandler) getAppsByFeatureName(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	apps, err := dbretrieval.GetAppsByFeatureName(dbHandler.db, ps.ByName("featureName"))
 	if err != nil {
@@ -25,7 +25,7 @@ func (dbHandler *DbHandler) GetAppsByFeatureName(w http.ResponseWriter, r *http.
 		return
 	}
 }
-func (dbHandler *DbHandler) GetAppFeaturesByPackageName(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (dbHandler *DbHandler) getAppFeaturesByPackageName(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	features, err := dbretrieval.GetFeaturesByPackageName(dbHandler.db, ps.ByName("packageName"))
 	if err != nil {
@@ -39,7 +39,7 @@ func (dbHandler *DbHandler) GetAppFeaturesByPackageName(w http.ResponseWriter, r
 	}
 }
 
-func (dbHandler *DbHandler) GetFeaturesByCategoryName(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (dbHandler *DbHandler) getFeaturesByCategoryName(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	features, err := dbretrieval.GetFeaturesByCategoryName(dbHandler.db, ps.ByName("categoryName"))
 	if err != nil {
