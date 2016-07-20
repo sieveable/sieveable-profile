@@ -13,6 +13,6 @@ before_install:
 before_script:
   - cat db_commands.sql | mysql -u travis
 script:
-  - "echo 'mode: atomic' > coverage.cov && go list ./... | xargs -n1 -I{} sh -c 'go test -covermode=atomic -coverprofile=coverage.tmp {} && tail -n +2 coverage.tmp >> coverage.cov' && rm coverage.tmp"
+  - ./run-tests.sh
 after_success:
   - $HOME/gopath/bin/goveralls -coverprofile=coverage.cov -service=travis-ci
