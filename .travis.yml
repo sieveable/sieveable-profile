@@ -13,6 +13,6 @@ before_install:
 before_script:
   - cat db_commands.sql | mysql -u travis
 script:
-  - ./run-tests.sh
+  - sh ./run-tests.sh
 after_success:
   - $HOME/gopath/bin/goveralls -coverprofile=coverage.cov -service=travis-ci
