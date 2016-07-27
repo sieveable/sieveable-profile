@@ -25,22 +25,22 @@ import (
 			   "versionName":"1.2",
 			   "versionCode":8,
 			   "listing":{
-				   "releaseDate":"January 16, 2016",
+				   "releaseDate":"2016-01-15",
 				   "downloads":100
 				   "ratings": 4.2
 			   },
 			   "ui":{},
 			   "manifest":{}
-		     }
-			 ]
-		 }
+		   }
+	]
+}
 
 */
 type CustomTime struct {
 	time.Time
 }
 
-const timeLayout = "January 2, 2006"
+const timeLayout = "2006-01-02"
 
 func (ct *CustomTime) UnmarshalJSON(b []byte) (err error) {
 	if b[0] == '"' && b[len(b)-1] == '"' {

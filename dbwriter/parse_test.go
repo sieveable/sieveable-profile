@@ -24,7 +24,7 @@ func TestParse(t *testing.T) {
 			"versionName":"1.2",
 			"versionCode":8,
 			"listing":{
-				"releaseDate":"January 16, 2016",
+				"releaseDate":"2016-01-24",
 				"downloads":100,
 				"ratings": 4.2
 			},
@@ -41,7 +41,7 @@ func TestParse(t *testing.T) {
 		Description: "Apps that implement Material Design"}
 	expectedFeature := FeatureType{Name: "feature_name",
 		Description: "feature_description", SieveableQuery: "sieveable_query_value"}
-	releaseDate, _ := time.Parse("January 2, 2006", "January 16, 2016")
+	releaseDate, _ := time.Parse("2006-01-02", "2016-01-24")
 	cDate := CustomTime{releaseDate}
 	expectedListing := ListingType{Downloads: 100, Ratings: 4.2,
 		ReleaseDate: cDate}
