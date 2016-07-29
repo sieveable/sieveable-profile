@@ -13,14 +13,20 @@ import (
 var db *sql.DB
 var category = dbwriter.CategoryType{Type: "ui", Name: "material-design",
 	Description: "Apps that implement Material Design"}
-var feature = dbwriter.FeatureType{Name: "feature_name",
+var firstFeature = dbwriter.FeatureType{Name: "first_feature_name",
 	Description: "feature_description", SieveableQuery: "sieveable_query_value"}
-var releaseDate, _ = time.Parse("January 2, 2006", "January 16, 2016")
-var cDate = dbwriter.CustomTime{releaseDate}
-var listing = dbwriter.ListingType{Downloads: 100, Ratings: 4.2,
-	ReleaseDate: cDate}
-var app = dbwriter.AppType{Id: "com.example.app-8", PackageName: "com.example.app",
-	VersionName: "1.2", VersionCode: 8, Listing: listing}
+var secondFeature = dbwriter.FeatureType{Name: "second_feature_name",
+	Description: "feature_description", SieveableQuery: "sieveable_query_value"}
+var firstReleaseDate, _ = time.Parse("January 2, 2006", "January 16, 2016")
+var secondReleaseDate, _ = time.Parse("January 2, 2006", "March 03 , 2016")
+var firstListing = dbwriter.ListingType{Downloads: 100, Ratings: 4.2,
+	ReleaseDate: dbwriter.CustomTime{firstReleaseDate}}
+var secondListing = dbwriter.ListingType{Downloads: 100, Ratings: 4.2,
+	ReleaseDate: dbwriter.CustomTime{secondReleaseDate}}
+var firstApp = dbwriter.AppType{Id: "com.example.app-8", PackageName: "com.example.app",
+	VersionName: "1.2", VersionCode: 8, Listing: firstListing}
+var secondApp = dbwriter.AppType{Id: "com.example.app-9", PackageName: "com.example.app",
+	VersionName: "1.3", VersionCode: 9, Listing: secondListing}
 
 func TestMain(m *testing.M) {
 	if err := setup(); err != nil {
@@ -36,9 +42,14 @@ func setup() (err error) {
 	if err != nil {
 		return err
 	}
-	var res dbwriter.Response = dbwriter.Response{category, feature, []dbwriter.AppType{app}}
-	fmt.Println("Inserting", res)
-	return dbwriter.Insert(db, res)
+	var firstRes dbwriter.Response = dbwriter.Response{category,
+		firstFeature, []dbwriter.AppType{firstApp}}
+	var secondRes dbwriter.Response = dbwriter.Response{category,
+		secondFeature, []dbwriter.AppType{secondApp}}
+	if err := dbwriter.Insert(db, firstRes); err != nil {
+		return err
+	}
+	return dbwriter.Insert(db, secondRes)
 }
 
 func getDbConnection() (*sql.DB, error) {
@@ -55,7 +66,17 @@ func getDbConnection() (*sql.DB, error) {
 }
 
 func TestGetFeaturesByPackageName(t *testing.T) {
-	features, err := GetFeaturesByPackageName(db, app.PackageName)
+	features, err := GetFeaturesByPackageName(db, firstApp.PackageName)
+	if err != nil {
+		t.Errorf("Expected app features but got an error instead. %v", err)
+	}
+	if len(features) != 2 {
+		t.Errorf("Expected an array of features with size 2 but got %d instead", len(features))
+	}
+}
+
+func TestGetLatestFeaturesByPackageName(t *testing.T) {
+	features, err := GetLatestFeaturesByPackageName(db, firstApp.PackageName)
 	if err != nil {
 		t.Errorf("Expected app features but got an error instead. %v", err)
 	}
@@ -65,7 +86,7 @@ func TestGetFeaturesByPackageName(t *testing.T) {
 }
 
 func TestGetAppsByFeatureName(t *testing.T) {
-	apps, err := GetAppsByFeatureName(db, feature.Name)
+	apps, err := GetAppsByFeatureName(db, firstFeature.Name)
 	if err != nil {
 		t.Errorf("Expected an array of apps but got an error instead. %v", err)
 	}
@@ -73,13 +94,13 @@ func TestGetAppsByFeatureName(t *testing.T) {
 		t.Errorf("Expected an array of apps with size 1 but got %d instead", len(apps))
 	}
 }
+
 func TestGetFeaturesByCategoryName(t *testing.T) {
-	fmt.Println("Category name", category.Name)
 	features, err := GetFeaturesByCategoryName(db, category.Name)
 	if err != nil {
 		t.Errorf("Expected an array of features but got an error instead. %v", err)
 	}
-	if len(features) != 1 {
-		t.Errorf("Expected an array of features with size 1 but got %d instead", len(features))
+	if len(features) != 2 {
+		t.Errorf("Expected an array of features with size 2 but got %d instead", len(features))
 	}
 }

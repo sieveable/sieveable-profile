@@ -42,7 +42,6 @@ func setup() (err error) {
 		return err
 	}
 	var res dbwriter.Response = dbwriter.Response{category, feature, []dbwriter.AppType{app}}
-	fmt.Println("Inserting", res)
 	return dbwriter.Insert(db, res)
 }
 
@@ -96,6 +95,29 @@ func TestGetAppFeaturesByPackageName(t *testing.T) {
 	dbHandler := &DbHandler{db}
 	ps := httprouter.Params{httprouter.Param{"packageName", "com.example.app"}}
 	uri := "/features/apps/"
+	resp, err := doHttpRequest(uri, ps, dbHandler.getAppFeaturesByPackageName)
+	if err != nil {
+		t.Error(err)
+	}
+	if resp.Code != 200 {
+		t.Errorf("Expected HTTP response code of 200 but got %d", resp.Code)
+	}
+	var results []dbretrieval.FeatureResult = []dbretrieval.FeatureResult{}
+	if err := json.NewDecoder(resp.Body).Decode(&results); err != nil {
+		t.Errorf("Failed to decode response body. %v", err)
+	}
+	if len(results) != 1 {
+		t.Errorf("Expected the length of the result array to be one but got %d", len(results))
+	}
+	if results[0].Name != "feature_name" {
+		t.Errorf("Expected feature name to equal feature_name but got %s", results[0].Name)
+	}
+}
+
+func TestGetLatestAppFeaturesByPackageName(t *testing.T) {
+	dbHandler := &DbHandler{db}
+	ps := httprouter.Params{httprouter.Param{"packageName", "com.example.app"}}
+	uri := "/features/apps?latest=true"
 	resp, err := doHttpRequest(uri, ps, dbHandler.getAppFeaturesByPackageName)
 	if err != nil {
 		t.Error(err)

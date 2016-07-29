@@ -10,11 +10,8 @@ type FeatureResult struct {
 	SieveableQuery string `json:"sieveable_query"`
 }
 
-// Given the package name, return the app's features
-func GetFeaturesByPackageName(db *sql.DB, packageName string) ([]FeatureResult, error) {
-	rows, err := db.Query("SELECT name, description, sieveable_query FROM feature "+
-		"WHERE id IN (SELECT feature_id FROM app_feature WHERE app_id IN "+
-		"(SELECT id FROM app WHERE package_name = ?))", packageName)
+func getFeatures(db *sql.DB, query string, packageName string) ([]FeatureResult, error) {
+	rows, err := db.Query(query, packageName)
 	if err != nil {
 		return nil, err
 	}
@@ -29,6 +26,23 @@ func GetFeaturesByPackageName(db *sql.DB, packageName string) ([]FeatureResult, 
 		features = append(features, f)
 	}
 	return features, nil
+}
+
+// Given a package name, return all app's features throughout its history
+func GetFeaturesByPackageName(db *sql.DB, packageName string) ([]FeatureResult, error) {
+	var query string = "SELECT name, description, sieveable_query FROM feature " +
+		"WHERE id IN (SELECT feature_id FROM app_feature WHERE app_id IN " +
+		"(SELECT id FROM app WHERE package_name = ?))"
+	return getFeatures(db, query, packageName)
+}
+
+// Given a package name, return the latest app's features
+func GetLatestFeaturesByPackageName(db *sql.DB, packageName string) ([]FeatureResult, error) {
+	var query string = "SELECT name, description, sieveable_query FROM feature " +
+		"WHERE id IN (SELECT feature_id FROM app_feature WHERE app_id IN " +
+		"(SELECT id FROM app WHERE release_date =( " +
+		"SELECT MAX(release_date) FROM app WHERE package_name=?)))"
+	return getFeatures(db, query, packageName)
 }
 
 // Given a category name, return all features within that category
