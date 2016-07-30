@@ -25,23 +25,11 @@ func TestMain(m *testing.M) {
 }
 
 func setup() (err error) {
-	db, err = getDatabaseConnection()
+	db, err = getDbConnection()
 	if err != nil {
 		return err
 	}
 	return nil
-}
-
-func getDatabaseConnection() (*sql.DB, error) {
-	db, err := sql.Open("mysql", os.Getenv("USER")+":"+os.Getenv("PW")+"@/"+os.Getenv("DB"))
-	if err != nil {
-		return nil, fmt.Errorf("Failed to get a handle for the database. %v\n", err.Error())
-	}
-	if err = db.Ping(); err != nil {
-		return nil, fmt.Errorf("Failed to connect to DB. Make sure that the required "+
-			"environment variables are set. %v\n", err.Error())
-	}
-	return db, nil
 }
 
 func doHttpRequest(uri string, ps httprouter.Params, handle httprouter.Handle) (*httptest.ResponseRecorder, error) {
