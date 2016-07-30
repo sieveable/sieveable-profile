@@ -1,3 +1,4 @@
+DROP DATABASE IF EXISTS test_apps;
 CREATE DATABASE test_apps;
 USE test_apps;
 CREATE TABLE IF NOT EXISTS app (id VARCHAR(200) NOT NULL PRIMARY KEY,
@@ -31,3 +32,24 @@ CREATE TABLE IF NOT EXISTS app_feature (
     ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (feature_id) REFERENCES feature(id)
     ON UPDATE CASCADE ON DELETE CASCADE);
+# insert data
+INSERT INTO category(name, type, description) VALUES
+    ('material-design', 'ui', 'Apps that implement Material Design');
+SET @cat_id = LAST_INSERT_ID();
+INSERT INTO app(id, package_name, version_code, version_name, downloads, 
+     ratings, release_date) VALUES('com.example.app-8', 'com.example.app',
+     8, '1.2', 100, 4.2, '2016-01-16');
+SET @app_1_id = LAST_INSERT_ID();
+INSERT INTO app(id, package_name, version_code, version_name, downloads, 
+     ratings, release_date) VALUES('com.example.app-9', 'com.example.app',
+     9, '1.3', 100, 4.2, '2016-03-22');
+SET @app_2_id = LAST_INSERT_ID();
+INSERT INTO feature(name, description, sieveable_query, category_id) VALUES(
+     'first_feature_name', 'feature_description', 'MATCH app...', @cat_id);
+SET @feature_1_id = LAST_INSERT_ID();
+INSERT INTO feature(name, description, sieveable_query, category_id) VALUES(
+     'second_feature_name', 'feature_description', 'MATCH app...', @cat_id);
+SET @feature_2_id = LAST_INSERT_ID();
+INSERT INTO app_feature VALUES('com.example.app-8', @feature_1_id);
+INSERT INTO app_feature VALUES('com.example.app-8', @feature_2_id);
+INSERT INTO app_feature VALUES('com.example.app-9', @feature_2_id);

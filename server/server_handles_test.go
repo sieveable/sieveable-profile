@@ -7,25 +7,13 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/julienschmidt/httprouter"
 	"github.com/sieveable/sieveable-profile/dbretrieval"
-	"github.com/sieveable/sieveable-profile/dbwriter"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
-	"time"
 )
 
 var db *sql.DB
-var category = dbwriter.CategoryType{Type: "ui", Name: "material-design",
-	Description: "Apps that implement Material Design"}
-var feature = dbwriter.FeatureType{Name: "feature_name",
-	Description: "feature_description", SieveableQuery: "sieveable_query_value"}
-var releaseDate, _ = time.Parse("January 2, 2006", "January 16, 2016")
-var cDate = dbwriter.CustomTime{releaseDate}
-var listing = dbwriter.ListingType{Downloads: 100, Ratings: 4.2,
-	ReleaseDate: cDate}
-var app = dbwriter.AppType{Id: "com.example.app-8", PackageName: "com.example.app",
-	VersionName: "1.2", VersionCode: 8, Listing: listing}
 
 func TestMain(m *testing.M) {
 	if err := setup(); err != nil {
@@ -41,8 +29,7 @@ func setup() (err error) {
 	if err != nil {
 		return err
 	}
-	var res dbwriter.Response = dbwriter.Response{category, feature, []dbwriter.AppType{app}}
-	return dbwriter.Insert(db, res)
+	return nil
 }
 
 func getDatabaseConnection() (*sql.DB, error) {
@@ -69,7 +56,7 @@ func doHttpRequest(uri string, ps httprouter.Params, handle httprouter.Handle) (
 
 func TestGetAppsByFeatureName(t *testing.T) {
 	dbHandler := &DbHandler{db}
-	ps := httprouter.Params{httprouter.Param{"featureName", "feature_name"}}
+	ps := httprouter.Params{httprouter.Param{"featureName", "first_feature_name"}}
 	uri := "/apps/features/"
 	resp, err := doHttpRequest(uri, ps, dbHandler.getAppsByFeatureName)
 	if err != nil {
@@ -106,11 +93,8 @@ func TestGetAppFeaturesByPackageName(t *testing.T) {
 	if err := json.NewDecoder(resp.Body).Decode(&results); err != nil {
 		t.Errorf("Failed to decode response body. %v", err)
 	}
-	if len(results) != 1 {
-		t.Errorf("Expected the length of the result array to be one but got %d", len(results))
-	}
-	if results[0].Name != "feature_name" {
-		t.Errorf("Expected feature name to equal feature_name but got %s", results[0].Name)
+	if len(results) != 2 {
+		t.Errorf("Expected the length of the result array to be 2 but got %d", len(results))
 	}
 }
 
@@ -132,8 +116,8 @@ func TestGetLatestAppFeaturesByPackageName(t *testing.T) {
 	if len(results) != 1 {
 		t.Errorf("Expected the length of the result array to be one but got %d", len(results))
 	}
-	if results[0].Name != "feature_name" {
-		t.Errorf("Expected feature name to equal feature_name but got %s", results[0].Name)
+	if results[0].Name != "second_feature_name" {
+		t.Errorf("Expected feature name to equal second_feature_name but got %s", results[0].Name)
 	}
 }
 
@@ -152,10 +136,7 @@ func TestGetAppFeaturesByCategoryName(t *testing.T) {
 	if err := json.NewDecoder(resp.Body).Decode(&results); err != nil {
 		t.Errorf("Failed to decode response body. %v", err)
 	}
-	if len(results) != 1 {
-		t.Errorf("Expected the length of the result array to be one but got %d", len(results))
-	}
-	if results[0].Name != "feature_name" {
-		t.Errorf("Expected feature name to equal feature_name but got %s", results[0].Name)
+	if len(results) != 2 {
+		t.Errorf("Expected the length of the result array to be 2 but got %d", len(results))
 	}
 }

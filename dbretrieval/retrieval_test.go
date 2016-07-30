@@ -4,29 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/sieveable/sieveable-profile/dbwriter"
 	"os"
 	"testing"
-	"time"
 )
 
 var db *sql.DB
-var category = dbwriter.CategoryType{Type: "ui", Name: "material-design",
-	Description: "Apps that implement Material Design"}
-var firstFeature = dbwriter.FeatureType{Name: "first_feature_name",
-	Description: "feature_description", SieveableQuery: "sieveable_query_value"}
-var secondFeature = dbwriter.FeatureType{Name: "second_feature_name",
-	Description: "feature_description", SieveableQuery: "sieveable_query_value"}
-var firstReleaseDate, _ = time.Parse("January 2, 2006", "January 16, 2016")
-var secondReleaseDate, _ = time.Parse("January 2, 2006", "March 03 , 2016")
-var firstListing = dbwriter.ListingType{Downloads: 100, Ratings: 4.2,
-	ReleaseDate: dbwriter.CustomTime{firstReleaseDate}}
-var secondListing = dbwriter.ListingType{Downloads: 100, Ratings: 4.2,
-	ReleaseDate: dbwriter.CustomTime{secondReleaseDate}}
-var firstApp = dbwriter.AppType{Id: "com.example.app-8", PackageName: "com.example.app",
-	VersionName: "1.2", VersionCode: 8, Listing: firstListing}
-var secondApp = dbwriter.AppType{Id: "com.example.app-9", PackageName: "com.example.app",
-	VersionName: "1.3", VersionCode: 9, Listing: secondListing}
 
 func TestMain(m *testing.M) {
 	if err := setup(); err != nil {
@@ -42,14 +24,7 @@ func setup() (err error) {
 	if err != nil {
 		return err
 	}
-	var firstRes dbwriter.Response = dbwriter.Response{category,
-		firstFeature, []dbwriter.AppType{firstApp}}
-	var secondRes dbwriter.Response = dbwriter.Response{category,
-		secondFeature, []dbwriter.AppType{secondApp}}
-	if err := dbwriter.Insert(db, firstRes); err != nil {
-		return err
-	}
-	return dbwriter.Insert(db, secondRes)
+	return nil
 }
 
 func getDbConnection() (*sql.DB, error) {
@@ -66,7 +41,7 @@ func getDbConnection() (*sql.DB, error) {
 }
 
 func TestGetFeaturesByPackageName(t *testing.T) {
-	features, err := GetFeaturesByPackageName(db, firstApp.PackageName)
+	features, err := GetFeaturesByPackageName(db, "com.example.app")
 	if err != nil {
 		t.Errorf("Expected app features but got an error instead. %v", err)
 	}
@@ -76,7 +51,7 @@ func TestGetFeaturesByPackageName(t *testing.T) {
 }
 
 func TestGetLatestFeaturesByPackageName(t *testing.T) {
-	features, err := GetLatestFeaturesByPackageName(db, firstApp.PackageName)
+	features, err := GetLatestFeaturesByPackageName(db, "com.example.app")
 	if err != nil {
 		t.Errorf("Expected app features but got an error instead. %v", err)
 	}
@@ -86,7 +61,7 @@ func TestGetLatestFeaturesByPackageName(t *testing.T) {
 }
 
 func TestGetAppsByFeatureName(t *testing.T) {
-	apps, err := GetAppsByFeatureName(db, firstFeature.Name)
+	apps, err := GetAppsByFeatureName(db, "first_feature_name")
 	if err != nil {
 		t.Errorf("Expected an array of apps but got an error instead. %v", err)
 	}
@@ -96,7 +71,7 @@ func TestGetAppsByFeatureName(t *testing.T) {
 }
 
 func TestGetFeaturesByCategoryName(t *testing.T) {
-	features, err := GetFeaturesByCategoryName(db, category.Name)
+	features, err := GetFeaturesByCategoryName(db, "material-design")
 	if err != nil {
 		t.Errorf("Expected an array of features but got an error instead. %v", err)
 	}
