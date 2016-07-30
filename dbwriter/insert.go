@@ -29,6 +29,7 @@ func Insert(db *sql.DB, res Response) (err error) {
 	}
 	return nil
 }
+
 func insertCategory(db *sql.DB, category *CategoryType) (categoryId int64, err error) {
 	stmtIns, err := db.Prepare("INSERT INTO category SET name=?,type=?,description=?")
 	if err := checkError("category", err); err != nil {
@@ -51,21 +52,18 @@ func insertCategory(db *sql.DB, category *CategoryType) (categoryId int64, err e
 	}
 	return categoryId, nil
 }
+
 func getIdByName(db *sql.DB, table string, name string) (id int64, err error) {
 	if table != "category" && table != "feature" {
 		return -1, fmt.Errorf("Cannot get id for an unknown table.")
 	}
-	stmtOut, err := db.Prepare("SELECT id FROM " + table + " WHERE name =?")
-	if err != nil {
-		return -1, fmt.Errorf("Failed to find "+table+" id for %s\n", name)
-	}
-	defer stmtOut.Close()
-	err = stmtOut.QueryRow(name).Scan(&id)
+	err = db.QueryRow("SELECT id FROM "+table+" WHERE name=?", name).Scan(&id)
 	if err != nil {
 		return -1, fmt.Errorf("Failed to find "+table+" id for %s\n", name)
 	}
 	return id, nil
 }
+
 func insertFeature(db *sql.DB, feature *FeatureType, categoryId *int64) (featureId int64, err error) {
 	stmtIns, err := db.Prepare("INSERT INTO feature SET " +
 		"name=?,description=?,sieveable_query=?,category_id=?")
@@ -90,6 +88,7 @@ func insertFeature(db *sql.DB, feature *FeatureType, categoryId *int64) (feature
 	}
 	return featureId, nil
 }
+
 func insertApp(db *sql.DB, app *AppType) (err error) {
 	stmtIns, err := db.Prepare("INSERT INTO app SET id=?, package_name=?," +
 		"version_code=?,version_name=?,downloads=?,ratings=?,release_date=?")
@@ -105,6 +104,7 @@ func insertApp(db *sql.DB, app *AppType) (err error) {
 	}
 	return nil
 }
+
 func insertAppFeature(db *sql.DB, appId string, featureId int64) (err error) {
 	stmtIns, err := db.Prepare("INSERT INTO app_feature VALUES(?,?)")
 	if err = checkError("app_feature", err); err != nil {
@@ -117,6 +117,7 @@ func insertAppFeature(db *sql.DB, appId string, featureId int64) (err error) {
 	}
 	return nil
 }
+
 func checkError(table string, e error) (err error) {
 	if e != nil {
 		msg := e.Error()

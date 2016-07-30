@@ -93,6 +93,31 @@ func TestInsertAppFeature(t *testing.T) {
 		t.Errorf("there were unfulfilled expections: %s", err)
 	}
 }
+
+func TestGetIdByName(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error occurred: '%s' when attempting to open a stub db connection", err)
+	}
+	defer db.Close()
+	mock.ExpectPrepare("INSERT INTO category").ExpectExec().
+		WithArgs(category.Name, category.Type, category.Description).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	categoryId, err := insertCategory(db, &category)
+	if err != nil || categoryId != 1 {
+		t.Errorf("Failed to insert a category: %s", err)
+	}
+	mock.ExpectQuery("SELECT id FROM category").
+		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+	id, err := getIdByName(db, "category", category.Name)
+	if err != nil || id != 1 {
+		t.Errorf("Failed to get the inserted category id")
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("id=%d. There were unfulfilled expections: %s", id, err)
+	}
+}
+
 func TestIntegration(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
