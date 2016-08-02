@@ -11,5 +11,6 @@ func NewRouter(db *sql.DB) *httprouter.Router {
 	router.GET("/apps/features/:featureName", dbHandler.getAppsByFeatureName)
 	router.GET("/features/apps/:packageName", dbHandler.getAppFeaturesByPackageName)
 	router.GET("/features/categories/:categoryName", dbHandler.getFeaturesByCategoryName)
+	router.GET("/categories/:type", dbHandler.getCategoriesByType)
 	return router
 }

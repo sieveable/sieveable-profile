@@ -65,5 +65,20 @@ func (dbHandler *DbHandler) getFeaturesByCategoryName(w http.ResponseWriter,
 		http.Error(w, err.Error(), 500)
 		return
 	}
+}
 
+func (dbHandler *DbHandler) getCategoriesByType(w http.ResponseWriter,
+	r *http.Request, ps httprouter.Params) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	categories, err := dbretrieval.GetCategoriesByType(dbHandler.db,
+		ps.ByName("type"))
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(categories); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
 }

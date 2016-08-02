@@ -17,7 +17,8 @@ func TestRoutes(t *testing.T) {
 	ts := httptest.NewServer(router)
 	defer ts.Close()
 	var routes []string = []string{"/apps/features/:feature_name",
-		"/features/apps/:packageName", "/features/categories/:cat_name"}
+		"/features/apps/:packageName", "/features/categories/:cat_name",
+		"/categories/:type"}
 	for _, route := range routes {
 		res, err := http.Get(ts.URL + route)
 		if err != nil {
