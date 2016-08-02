@@ -5,10 +5,10 @@ import (
 )
 
 type categoryResult struct {
-	Id          int64
-	Name        string
-	Type        string
-	Description string
+	Id          int64  `json:"id"`
+	Name        string `json:"name"`
+	Type        string `json:"type"`
+	Description string `json:"description"`
 }
 
 func GetCategoriesByType(db *sql.DB, typeName string) ([]categoryResult, error) {
