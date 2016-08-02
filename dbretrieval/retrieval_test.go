@@ -79,3 +79,13 @@ func TestGetFeaturesByCategoryName(t *testing.T) {
 		t.Errorf("Expected an array of features with size 2 but got %d instead", len(features))
 	}
 }
+
+func TestGetCategoriesByType(t *testing.T) {
+	categories, err := GetCategoriesByType(db, "ui")
+	if err != nil {
+		t.Errorf("Expected feature categories but got an error instead. %v", err)
+	}
+	if len(categories) != 1 {
+		t.Errorf("Expected an array of categories with size 1 but got %d instead", len(categories))
+	}
+}
