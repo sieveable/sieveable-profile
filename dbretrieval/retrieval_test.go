@@ -70,6 +70,16 @@ func TestGetAppsByFeatureName(t *testing.T) {
 	}
 }
 
+func TestGetTopAppsByFeatureName(t *testing.T) {
+	apps, err := GetTopAppsByFeatureName(db, "first_feature_name")
+	if err != nil {
+		t.Errorf("Expected an array of apps but got an error instead. %v", err)
+	}
+	if len(apps) != 1 {
+		t.Errorf("Expected an array of apps with size 1 but got %d instead", len(apps))
+	}
+}
+
 func TestGetFeaturesByCategoryName(t *testing.T) {
 	features, err := GetFeaturesByCategoryName(db, "material-design")
 	if err != nil {
