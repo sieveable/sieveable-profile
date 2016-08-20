@@ -15,15 +15,29 @@ type DbHandler struct {
 func (dbHandler *DbHandler) getAppsByFeatureName(w http.ResponseWriter,
 	r *http.Request, ps httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	apps, err := dbretrieval.GetAppsByFeatureName(dbHandler.db, ps.ByName("featureName"))
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(apps); err != nil {
-		http.Error(w, err.Error(), 500)
-		return
+	queryValues := r.URL.Query()
+	if queryValues.Get("top") == "true" {
+		topApps, err := dbretrieval.GetTopAppsByFeatureName(dbHandler.db, ps.ByName("featureName"))
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		if err := json.NewEncoder(w).Encode(topApps); err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+	} else {
+		allApps, err := dbretrieval.GetAppsByFeatureName(dbHandler.db, ps.ByName("featureName"))
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		if err := json.NewEncoder(w).Encode(allApps); err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
 	}
 }
 

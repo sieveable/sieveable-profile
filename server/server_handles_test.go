@@ -66,6 +66,30 @@ func TestGetAppsByFeatureName(t *testing.T) {
 	}
 }
 
+func TestGetTopAppsByFeatureName(t *testing.T) {
+	dbHandler := &DbHandler{db}
+	ps := httprouter.Params{httprouter.Param{"featureName", "first_feature_name"}}
+	uri := "/apps/features?top=true"
+	resp, err := doHttpRequest(uri, ps, dbHandler.getAppsByFeatureName)
+	if err != nil {
+		t.Error(err)
+	}
+	if resp.Code != 200 {
+		t.Errorf("Expected HTTP response code of 200 but got %d", resp.Code)
+	}
+	var results []dbretrieval.AppInfo = []dbretrieval.AppInfo{}
+	if err := json.NewDecoder(resp.Body).Decode(&results); err != nil {
+		t.Errorf("Failed to decode response body. %v", err)
+	}
+	if len(results) != 1 {
+		t.Errorf("Expected the length of the result array to be one but got %d", len(results))
+	}
+	if results[0].PackageName != "com.example.app" {
+		t.Errorf("Expected app's package name to equal com.example.app but got %s",
+			results[0].PackageName)
+	}
+}
+
 func TestGetAppFeaturesByPackageName(t *testing.T) {
 	dbHandler := &DbHandler{db}
 	ps := httprouter.Params{httprouter.Param{"packageName", "com.example.app"}}
