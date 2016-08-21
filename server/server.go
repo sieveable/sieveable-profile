@@ -15,7 +15,8 @@ func main() {
 		log.Fatalf("DB connection error. %v", err)
 	}
 	router := NewRouter(db)
-	middlewares := NewSingleHost(Logger(router), getAllowedHost())
+	middlewares := NewSingleHost(NewCORSPolicy(Logger(router),
+		getAllowedOrigins(), getAllowedMethods()), getAllowedHost())
 	log.Fatal(http.ListenAndServe(":"+getServerPort(), middlewares))
 }
 
@@ -34,6 +35,19 @@ func getAllowedHost() string {
 	}
 	return allowedHost + ":" + getServerPort()
 }
+
+func getAllowedOrigins() []string {
+	var allowedOrigin string = "http://localhost:8080"
+	if h := os.Getenv("allowedOrigin"); h != "" {
+		allowedOrigin = h
+	}
+	return []string{allowedOrigin}
+}
+
+func getAllowedMethods() []string {
+	return []string{"GET"}
+}
+
 func getDbConnection() (*sql.DB, error) {
 	db, err := sql.Open("mysql", os.Getenv("USER")+":"+os.Getenv("PW")+"@/"+os.Getenv("DB"))
 	if err != nil {
