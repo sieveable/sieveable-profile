@@ -81,6 +81,25 @@ func (dbHandler *DbHandler) getFeaturesByCategoryName(w http.ResponseWriter,
 	}
 }
 
+func (dbHandler *DbHandler) getFeature(w http.ResponseWriter,
+	r *http.Request, ps httprouter.Params) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	feature, err := dbretrieval.GetFeatureByName(dbHandler.db,
+		ps.ByName("featureName"))
+	if err != nil {
+		if err == sql.ErrNoRows {
+			http.Error(w, "Not found", 404)
+		}
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(feature); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+}
+
 func (dbHandler *DbHandler) getCategoriesByType(w http.ResponseWriter,
 	r *http.Request, ps httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")

@@ -16,16 +16,17 @@ func TestRoutes(t *testing.T) {
 	router := NewRouter(db)
 	ts := httptest.NewServer(router)
 	defer ts.Close()
-	var routes []string = []string{"/apps/features/:feature_name",
-		"/features/apps/:packageName", "/features/categories/:cat_name",
-		"/categories/:type"}
+	var routes []string = []string{"/apps/features/first_feature_name",
+		"/features/apps/com.example.app", "/features/categories/material-design",
+		"/categories/ui", "/feature/first_feature_name"}
 	for _, route := range routes {
 		res, err := http.Get(ts.URL + route)
 		if err != nil {
 			t.Errorf("Route %s failed", route)
 		}
 		if res.StatusCode != 200 {
-			t.Errorf("Route %s returned %d HTTP status code", route, res.StatusCode)
+			t.Errorf("Route %s returned %d HTTP status code.",
+				route, res.StatusCode)
 		}
 	}
 }

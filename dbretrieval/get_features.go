@@ -67,21 +67,13 @@ func GetFeaturesByCategoryName(db *sql.DB, categoryName string) ([]FeatureResult
 }
 
 // Given a feature's name, return its details
-func GetFeatureName(db *sql.DB, featureName string) ([]FeatureResult, error) {
-	rows, err := db.Query("SELECT name, description, sieveable_query "+
-		"FROM feature WHERE name = ?", featureName)
+func GetFeatureByName(db *sql.DB, featureName string) (FeatureResult, error) {
+	var f FeatureResult
+	err := db.QueryRow("SELECT name, description, sieveable_query "+
+		"FROM feature WHERE name = ?", featureName).
+		Scan(&f.Name, &f.Description, &f.SieveableQuery)
 	if err != nil {
-		return nil, err
+		return f, err
 	}
-	defer rows.Close()
-	features := []FeatureResult{}
-	for rows.Next() {
-		var f FeatureResult = FeatureResult{}
-		err := rows.Scan(&f.Name, &f.Description, &f.SieveableQuery)
-		if err != nil {
-			return nil, err
-		}
-		features = append(features, f)
-	}
-	return features, nil
+	return f, nil
 }

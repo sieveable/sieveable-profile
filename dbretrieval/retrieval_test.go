@@ -91,7 +91,7 @@ func TestGetFeaturesByCategoryName(t *testing.T) {
 }
 
 func TestGetFeatureName(t *testing.T) {
-	features, err := GetFeatureName(db, "first_feature_name")
+	features, err := GetFeatureByName(db, "first_feature_name")
 	if err != nil {
 		t.Errorf("Expected an array of apps but got an error instead. %v", err)
 	}

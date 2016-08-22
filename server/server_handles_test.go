@@ -152,3 +152,23 @@ func TestGetAppFeaturesByCategoryName(t *testing.T) {
 		t.Errorf("Expected the length of the result array to be 2 but got %d", len(results))
 	}
 }
+
+func TestGetFeature(t *testing.T) {
+	dbHandler := &DbHandler{db}
+	ps := httprouter.Params{httprouter.Param{"featureName", "first_feature_name"}}
+	uri := "/feature/"
+	resp, err := doHttpRequest(uri, ps, dbHandler.getFeature)
+	if err != nil {
+		t.Error(err)
+	}
+	if resp.Code != 200 {
+		t.Errorf("Expected HTTP response code of 200 but got %d", resp.Code)
+	}
+	var result dbretrieval.FeatureResult = dbretrieval.FeatureResult{}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		t.Errorf("Failed to decode response body. %v", err)
+	}
+	if result.Name != "first_feature_name" {
+		t.Errorf("Expected feature name to be first_feature_name but got %s", result.Name)
+	}
+}
